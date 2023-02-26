@@ -11,7 +11,7 @@ import { promisify } from "util";
 
 const handler = nc<
   NextApiRequest & {
-    file: File;
+    files: File[];
   },
   NextApiResponse
 >({
@@ -37,11 +37,17 @@ handler.use(upload.array("file"));
 handler.post(async (req, res) => {
   const session = await getServerSession(req, res, authOptions);
   console.log(session);
+  console.log(req.files);
 
   try {
     const { name } = req.body;
     const files = req.files;
-    let task = null;
+    if (files.length === 0) {
+      return res.status(400).json({
+        error: "Please select a file",
+      });
+    }
+
     console.log({
       name,
       files,
@@ -52,7 +58,6 @@ handler.post(async (req, res) => {
     const urls: string[] = [];
 
     files.forEach(async (file: File) => {
-      console.log(file);
       const _file = await asyncReadFile(file.path);
       const fileParams = {
         Bucket: env.AWS_S3_BUCKET_NAME,
@@ -73,7 +78,7 @@ handler.post(async (req, res) => {
       }
 
       if (session) {
-        task = await prisma.task.create({
+        const task = await prisma.task.create({
           data: {
             name,
             files: {
@@ -87,14 +92,15 @@ handler.post(async (req, res) => {
             },
           },
         });
+        if (task) {
+          console.log(task);
+
+          return res.status(201).json({
+            task,
+          });
+        }
       }
     });
-
-    if (task) {
-      return res.status(201).json({
-        task,
-      });
-    }
   } catch (error) {
     console.log(error);
     return res.status(200).json({

@@ -1,7 +1,12 @@
+import { LogIn, LogOut, PlusCircle } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 export function Navbar({}) {
   const { data } = useSession();
+  const router = useRouter();
   const handleLogout = () => {
     signOut({
       redirect: true,
@@ -22,10 +27,11 @@ export function Navbar({}) {
         console.log(err);
       });
   };
+
   return (
     <nav
-      className="fixed flex w-full items-center justify-between border-b border-gray-300 bg-gradient-to-b from-[#2e026d]  
-      to-[#15162c] px-4 py-2
+      className="fixed z-50 flex w-full items-center justify-between border-b border-gray-300 bg-gradient-to-b  
+      from-[#2e026d] to-[#15162c] px-4 py-2
       "
     >
       <div className="flex items-center justify-center gap-4">
@@ -51,27 +57,53 @@ export function Navbar({}) {
           Recognito
         </h6>
       </div>
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex flex-col flex-wrap items-center justify-center gap-4 sm:flex-row">
+        <Link href="/playground/job-list">Recents Jobs</Link>
+        <Link href="/playground/completed-job-list">Completed Jobs</Link>
         {data?.user ? (
-          <p className="text-base text-white">
-            Welcome, {data?.user?.name?.split(" ")[0]}
-          </p>
+          <button
+            className="flex items-center justify-center gap-4 rounded-md bg-slate-100 px-4 py-2 text-[#2e026d]
+              transition duration-300
+              ease-in-out hover:bg-slate-100 
+            "
+            onClick={() => {
+              router.push({
+                hash: "#create-job",
+              });
+            }}
+          >
+            <PlusCircle />
+            <span className="text-sm">create new job</span>
+          </button>
         ) : null}
         {data?.user ? (
           <button
-            className="flex items-center justify-center gap-4 rounded-md bg-[#2e026d] px-4 py-1 text-white"
+            className="flex items-center justify-center gap-4 rounded-md bg-slate-100 px-4 py-2 text-[#2e026d]"
             onClick={() => {
               handleLogout();
             }}
           >
-            <div className="flex gap-4">Sign out</div>
+            <div className="flex items-center gap-4">
+              <Image
+                src={data.user.image as string}
+                width={25}
+                height={25}
+                alt={data.user.name as string}
+                className="rounded-full shadow-md"
+              />
+              <span>Sign out</span>
+              <LogOut size={16} />
+            </div>
           </button>
         ) : (
           <button
-            className="flex items-center justify-center gap-4 rounded-md bg-[#2e026d] px-4 py-1 text-white"
+            className="flex items-center justify-center gap-4 rounded-md bg-slate-100 px-4 py-1 text-white"
             onClick={() => handleLogin()}
           >
-            <div className="flex gap-4">Sign in</div>
+            <div className="flex items-center gap-4 text-[#2e026d] ">
+              <span>Sign in</span>
+              <LogIn size={16} />
+            </div>
           </button>
         )}
       </div>

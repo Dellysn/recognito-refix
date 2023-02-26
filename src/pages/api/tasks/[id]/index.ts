@@ -43,4 +43,42 @@ handler.get(async (req, res) => {
   res.status(200).json(task);
 });
 
+handler.delete(async (req, res) => {
+  const session = await getServerSession(req, res, authOptions);
+  const id = req.query.id;
+
+  if (session === null) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const task = await prisma.task.findUnique({
+    where: {
+      id: String(id),
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  if (task === null) {
+    res.status(404).json({ error: "Task not found" });
+
+    return;
+  }
+
+  if (task.userId !== session.user.id) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  await prisma.task.delete({
+    where: {
+      id: String(id),
+    },
+  });
+
+  res.status(200).json({ message: "Task deleted" });
+});
+
 export default handler;

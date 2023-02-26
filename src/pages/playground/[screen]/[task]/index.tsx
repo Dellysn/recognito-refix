@@ -1,28 +1,21 @@
-/* eslint-disable @next/next/no-img-element */
+import { OCRGround } from "@/features/playground/ocr-ground";
+import { OCRResult } from "@/features/playground/ocr-result";
 import { animated, useTransition } from "@react-spring/web";
 import { useRouter } from "next/router";
-import { CompleteJobList } from "./completed-job-list";
-import { PlaygroundJobList } from "./job-list";
-import { OCRGround } from "./ocr-ground";
 
-export const MainPlayground = () => {
+const TaskPage = () => {
+  const router = useRouter();
+  const { screen, task } = router.query;
   const pages = [
     {
       name: "job-list",
-      component: <PlaygroundJobList />,
-    },
-    {
-      name: "ocr-ground",
-      component: <OCRGround />,
+      component: <OCRGround taskId={task as string} />,
     },
     {
       name: "completed-job-list",
-      component: <CompleteJobList />,
+      component: <OCRResult taskId={task as string} />,
     },
   ];
-
-  const router = useRouter();
-  const { screen } = router.query;
 
   const transition = useTransition(screen, {
     from: { opacity: 0, transform: "translate3d(100%,0,0)" },
@@ -31,7 +24,7 @@ export const MainPlayground = () => {
   });
 
   return (
-    <div className="mx-auto flex w-[700px] max-w-[768px] flex-col items-center  gap-4 rounded-xl ">
+    <div className="mx-auto flex max-w-[768px] flex-col gap-4 rounded-xl bg-slate-800 p-8">
       {transition((style, item) => {
         const Page = pages.find((page) => page.name === item)?.component;
         return <animated.div style={style}>{Page && Page}</animated.div>;
@@ -39,3 +32,5 @@ export const MainPlayground = () => {
     </div>
   );
 };
+
+export default TaskPage;
