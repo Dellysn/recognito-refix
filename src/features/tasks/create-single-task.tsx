@@ -1,57 +1,74 @@
+/* eslint-disable @next/next/no-img-element */
 import { Dropzone } from "@/components/external";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/menu/modal";
+import { File } from "@/lib/multer";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { PlusCircle, X } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
-export function CreateSingleTask({ openSingleModal, setOpenSingleModal }: any) {
+export function CreateSingleTask({ openSingleModal }: any) {
   const generateRandomTaskName = () => {
     const randomString = Math.random().toString(36).substring(7);
     return `Task ${randomString}`;
   };
-  const randomName = generateRandomTaskName();
+  const router = useRouter();
+  const [randomTaskName, setRandomTaskName] = useState(
+    generateRandomTaskName()
+  );
+  useEffect(() => {
+    if (openSingleModal) {
+      setRandomTaskName(generateRandomTaskName());
+    }
+  }, [openSingleModal]);
   const [taskDetails, setTaskDetails] = useState<{
     name: string;
-    file:
-      | {
-          name: string;
-          path: string;
-          size: number;
-          type: string;
-        }[]
-      | null;
+    files: File[];
   }>({
-    name: randomName,
-    file: [],
+    name: randomTaskName,
+    files: [],
   });
 
-  const mutation = useMutation(async (data: any) => {
-    await axios.post("/api/tasks/add", data, {
-      headers: { "content-type": "multipart/form-data" },
-    });
-  });
+  const mutation = useMutation(
+    async (data: any) => {
+      return await axios.post("/api/tasks/add", data, {
+        headers: { "content-type": "multipart/form-data" },
+      });
+    },
+    {
+      onSuccess: () => {
+        alert("job created successfully");
+        setTaskDetails({
+          name: randomTaskName,
+          files: [],
+        });
+        router.push({
+          query: {
+            ...router.query,
+          },
+          hash: null,
+        });
+      },
+      onError: (error: unknown) => alert(error.response.data.error.toString()),
+    }
+  );
 
   function handleSubmitTask() {
-    if (taskDetails.name && taskDetails.file?.length > 0) {
+    if (taskDetails.name && taskDetails.files?.length > 0) {
       const formData = new FormData();
       formData.append("name", taskDetails.name);
-      taskDetails?.file.forEach((file) => {
-        formData.append("file", file);
+      taskDetails?.files?.forEach((file) => {
+        console.log(file);
+        formData.append("file", file[0] as unknown as Blob);
       });
+
       mutation.mutate(formData);
-      if (mutation.isSuccess) {
-        setTaskDetails({
-          name: randomName,
-          file: [],
-        });
-      }
     } else {
       alert("Please fill all the fields");
     }
@@ -59,19 +76,19 @@ export function CreateSingleTask({ openSingleModal, setOpenSingleModal }: any) {
 
   return (
     <Dialog
-      open={!!openSingleModal}
-      onOpenChange={(state) => {
-        setOpenSingleModal(state);
+      open={openSingleModal}
+      onOpenChange={() => {
+        router.push({
+          query: {
+            ...router.query,
+          },
+          hash: null,
+        });
       }}
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create a single task</DialogTitle>
-          <DialogDescription>
-            <p className="text-base">
-              create a single task by uploading a file
-            </p>
-          </DialogDescription>
+          <DialogTitle>Create New Job</DialogTitle>
         </DialogHeader>
         <section className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -97,14 +114,14 @@ export function CreateSingleTask({ openSingleModal, setOpenSingleModal }: any) {
               onDrop={(file) => {
                 setTaskDetails({
                   ...taskDetails,
-                  file: file.concat(taskDetails.file || []),
+                  files: [...taskDetails.files, file as unknown as File],
                 });
               }}
             />
             <div>
-              {taskDetails.file && taskDetails.file.length > 0 && (
+              {taskDetails.files && taskDetails.files.length > 0 && (
                 <div className="flex w-full flex-wrap justify-evenly">
-                  {taskDetails.file.map((file: any) => (
+                  {taskDetails.files.map((file: any) => (
                     <div
                       className="relative flex flex-col items-center justify-center gap-4"
                       key={file.name}
@@ -117,7 +134,7 @@ export function CreateSingleTask({ openSingleModal, setOpenSingleModal }: any) {
                           onClick={() => {
                             setTaskDetails({
                               ...taskDetails,
-                              file: taskDetails?.file.filter(
+                              files: taskDetails?.files.filter(
                                 (f) => f.name !== file.name
                               ),
                             });
@@ -128,10 +145,10 @@ export function CreateSingleTask({ openSingleModal, setOpenSingleModal }: any) {
                       <img
                         className="h-10 w-10 rounded-md bg-gray-300"
                         alt={file.name}
-                        src={URL.createObjectURL(file)}
+                        src={URL.createObjectURL(file[0])}
                       />
                       <p className="text-sm">
-                        {file.name.slice(0, 10) + "..."}
+                        {file[0].name.slice(0, 10) + "..."}
                       </p>
                     </div>
                   ))}

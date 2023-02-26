@@ -1,9 +1,8 @@
 import { type NextPage } from "next";
+import { signIn, SignInResponse, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
-import { signIn, SignInResponse, signOut, useSession } from "next-auth/react";
-import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -13,7 +12,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (sess?.user) {
-      void router.push("/ocr");
+      void router.push("/playground");
     }
   }, [sess?.user]);
 
@@ -42,25 +41,24 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
 const AuthButtons: React.FC<{
   handleLogin: () => void;
 }> = ({ handleLogin }) => {
   return (
-    <div className="flex  items-center justify-center gap-4">
+    <div className="flex items-center justify-center gap-4">
       <button
         className="flex items-center justify-center gap-4 rounded-md bg-[#2e026d] px-4 py-2 text-white"
         onClick={() => {
           handleLogin();
         }}
       >
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           <GoogleLogo />
           <span>Continue with Google</span>
         </div>
       </button>
       <button className="flex items-center justify-center gap-4 rounded-md bg-[#000000] px-4 py-2 text-white">
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           <GithubLogo />
           <span>Continue with Github</span>
         </div>
