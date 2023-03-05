@@ -27,8 +27,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "tailwind.config.cjs",
     "src/pages/playground/[screen]/[task]"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "tailwind.config.cjs"]
 }

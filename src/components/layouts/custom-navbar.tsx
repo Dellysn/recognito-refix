@@ -57,7 +57,7 @@ export function Navbar({}) {
           Recognito
         </h6>
       </div>
-      <div className="flex flex-col flex-wrap items-center justify-center gap-4 sm:flex-row">
+      <div className="fixed left-0 top-0 flex h-full flex-col flex-wrap items-center justify-center  gap-4 bg-[#2e026d] p-4 sm:static sm:flex-row sm:bg-transparent sm:p-0">
         <Link href="/playground/job-list">Recents Jobs</Link>
         <Link href="/playground/completed-job-list">Completed Jobs</Link>
         {data?.user ? (

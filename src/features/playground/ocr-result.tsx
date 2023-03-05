@@ -40,7 +40,7 @@ export const OCRResult = ({ taskId }: { taskId: string }) => {
           hash: null,
         });
       },
-      onError: (error: unknown) => alert(error.toString()),
+      onError: (error: any) => alert(error.toString()),
     }
   );
 
@@ -94,12 +94,12 @@ export const OCRResult = ({ taskId }: { taskId: string }) => {
                           }
                         }}
                       >
-                        Copy
+                        {copied ? "Copied" : "Copy"}
                       </button>{" "}
                     </animated.div>
                   )
               )}
-              <p className="text-sm">{result}</p>
+              <pre className="text-sm">{result}</pre>
             </div>
           );
         })}

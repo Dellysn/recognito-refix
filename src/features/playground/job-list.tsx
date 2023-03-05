@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -8,8 +9,12 @@ import { useState } from "react";
 
 export const PlaygroundJobList = () => {
   const [taskId, setTaskId] = useState<string | null>(null);
-  const { isLoading, data } = useQuery(["jobs"], async () =>
-    axios.get("/api/tasks")
+  const { isLoading, data } = useQuery(
+    ["jobs"],
+    async () => axios.get("/api/tasks"),
+    {
+      refetchInterval: 1000,
+    }
   );
   const router = useRouter();
   const dynamicRoute = router.query?.screen;
@@ -19,7 +24,9 @@ export const PlaygroundJobList = () => {
       <p className="text-lg text-gray-400">{data?.data?.length} jobs</p>
       <ul className="flex max-h-[450px] flex-col gap-4 overflow-y-scroll">
         {isLoading ? (
-          <div>loading...</div>
+          <div>
+            <Loader />
+          </div>
         ) : (
           data?.data?.map((item: any) => (
             <li

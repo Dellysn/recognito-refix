@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { createScheduler, createWorker } from "tesseract.js";
 
-export const OCRGround = ({ taskId }: { taskId: string }) => {
+export const OCRGround = ({ taskId }: { taskId?: string }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const [results, setResults] = useState<string[]>([]);
@@ -39,7 +39,7 @@ export const OCRGround = ({ taskId }: { taskId: string }) => {
           hash: null,
         });
       },
-      onError: (error: unknown) => alert(error.toString()),
+      onError: (error: any) => alert(error.toString()),
     }
   );
 
@@ -51,7 +51,7 @@ export const OCRGround = ({ taskId }: { taskId: string }) => {
       onSuccess: () => {
         alert("job output saved successfully");
       },
-      onError: (error: unknown) => alert(error.toString()),
+      onError: (error: any) => alert(error.toString()),
     }
   );
 
@@ -97,7 +97,7 @@ export const OCRGround = ({ taskId }: { taskId: string }) => {
       if (!isProcessing && results.length === tasks?.files.length) {
         await handleSaveResults();
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       setIsProcessing(false);
       alert(error.toString());
     }
@@ -217,9 +217,13 @@ export const OCRGround = ({ taskId }: { taskId: string }) => {
           </div>
 
           <div className="flex flex-col gap-4 rounded-xl bg-black p-3 ">
-            <p className="w-full bg-[#2e026d] p-4 text-base">
-              Progress Logs...{" "}
-            </p>
+            <div className="flex justify-between">
+              {" "}
+              <p className="w-full bg-[#2e026d] p-4 text-base">
+                Progress Logs...{" "}
+              </p>
+              {savedResultsMutation.isLoading && <Loader />}
+            </div>
 
             {taskId === tasks?.id && (
               <div className="p-xl flex max-h-[400px] flex-col gap-4 overflow-y-scroll rounded-xl bg-black font-mono">

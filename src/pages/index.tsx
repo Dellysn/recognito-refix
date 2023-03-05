@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { type NextPage } from "next";
 import { signIn, SignInResponse, useSession } from "next-auth/react";
 import Head from "next/head";
@@ -12,7 +13,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (sess?.user) {
-      void router.push("/playground");
+      void router.push("/playground/job-list");
     }
   }, [sess?.user]);
 

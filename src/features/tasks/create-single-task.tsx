@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @next/next/no-img-element */
 import { Dropzone } from "@/components/external";
+import { Loader } from "@/components/ui/loader";
 import {
   Dialog,
   DialogContent,
@@ -55,7 +57,7 @@ export function CreateSingleTask({ openSingleModal }: any) {
           hash: null,
         });
       },
-      onError: (error: unknown) => alert(error.response.data.error.toString()),
+      onError: (error: any) => alert(error.response.data.error.toString()),
     }
   );
 
@@ -64,8 +66,8 @@ export function CreateSingleTask({ openSingleModal }: any) {
       const formData = new FormData();
       formData.append("name", taskDetails.name);
       taskDetails?.files?.forEach((file) => {
-        console.log(file);
-        formData.append("file", file[0] as unknown as Blob);
+        // @ts-ignore
+        formData.append("file", file[0] as any);
       });
 
       mutation.mutate(formData);
@@ -135,7 +137,7 @@ export function CreateSingleTask({ openSingleModal }: any) {
                             setTaskDetails({
                               ...taskDetails,
                               files: taskDetails?.files.filter(
-                                (f) => f.name !== file.name
+                                (f: any) => f.name !== file.name
                               ),
                             });
                           }}
@@ -163,28 +165,7 @@ export function CreateSingleTask({ openSingleModal }: any) {
           >
             <PlusCircle />
             <span>create</span>
-            {mutation.isLoading && (
-              <svg
-                className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-            )}
+            {mutation.isLoading && <Loader />}
           </button>
         </section>
       </DialogContent>

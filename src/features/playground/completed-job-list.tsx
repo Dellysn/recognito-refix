@@ -1,3 +1,4 @@
+import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/helpers";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
@@ -16,7 +17,7 @@ export const CompleteJobList = () => {
   return (
     <div className="my-4 flex  flex-col gap-4 sm:min-w-[400px]">
       <p className="text-sm text-gray-400">
-        {isLoading ? "Loading..." : completedTasks?.length + " jobs "}
+        {isLoading ? <Loader /> : completedTasks?.length + " jobs "}
       </p>
       <ul className="flex max-h-[450px] flex-col gap-4 overflow-y-scroll">
         {completedTasks?.map((task: any) => {
